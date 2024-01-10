@@ -1,0 +1,6 @@
+data/
+figs/
+output_data/
+ParaView*Stuff/
+Plots*from*Sim/
+questions*from*sim*figs/
