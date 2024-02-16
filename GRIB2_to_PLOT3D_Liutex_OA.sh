@@ -25,7 +25,7 @@
 # FILE NAMES and RECORD NUMBER:
 filename="data/$1"
 ctl_filename="data/$1.ctl"
-record_number="data/$2"
+record_number="$2"
 grib_grid_file="data/$1_grid.dat"
 grib_velocity_file="data/$1_velocity.dat"
 

@@ -52,8 +52,8 @@ program main
 
 
     !! Input file names
-    grib_grid_filename = "grib_grid_data.dat"
-    grib_velocity_filename = "grib_velocity_data"
+    grib_grid_filename = "data/grib_grid_data.dat"
+    grib_velocity_filename = "data/grib_velocity_data"
 
 
     !! Read grib grid data file.

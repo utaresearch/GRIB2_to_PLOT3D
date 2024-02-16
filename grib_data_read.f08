@@ -18,7 +18,7 @@ program main
 
     !! file handling variables
     integer, parameter :: file1=10, file2=20, file3=30
-    character(100) :: grib_grid_filename, grib_velocity_filename
+    character(100) :: filename, grib_grid_filename, grib_velocity_filename
     character(500) :: first_velocity_component, second_velocity_component, third_velocity_component
     character(10) :: u_string, v_string, w_string
     character(100) :: grid_output_filename, fun_output_filename
@@ -52,8 +52,9 @@ program main
 
 
     !! Input file names
-    grib_grid_filename = "grib_grid_data.dat"
-    grib_velocity_filename = "grib_velocity_data"
+    call get_command_argument(1, filename)
+    grib_grid_filename = "data/"// trim(filename) //"_grid.dat"
+    grib_velocity_filename = "data/"// trim(filename) //"_velocity.dat"
 
 
     !! Read grib grid data file.
