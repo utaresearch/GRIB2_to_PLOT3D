@@ -16,7 +16,7 @@ module liutex_mod
     contains
 
     !! Subroutines
-    subroutine liutex(velocity_gradient_tensor, liutex_vector, liutex_magnitude, imax, jmax, kmax)\
+    subroutine liutex(velocity_gradient_tensor, liutex_vector, liutex_magnitude, imax, jmax, kmax)
         !!! Oscar Alvarez
         
         !!! Link to paper which contains this algorithm:
@@ -151,7 +151,8 @@ module liutex_mod
 
                         rotated_vel_grad = matmul( matmul(transpose(rotation_matrix), a), rotation_matrix )
 
-                        alpha = 0.5d0 * sqrt((rotated_vel_grad(2,2) - rotated_vel_grad(1,1))**2 + (rotated_vel_grad(2,1) + rotated_vel_grad(1,2))**2)
+                        alpha = 0.5d0 * sqrt((rotated_vel_grad(2,2) - rotated_vel_grad(1,1))**2   &
+                                             + (rotated_vel_grad(2,1) + rotated_vel_grad(1,2))**2)
                         beta  = 0.5d0 * (rotated_vel_grad(2,1) - rotated_vel_grad(1,2))
 
                         if(beta**2 > alpha**2) then
@@ -174,7 +175,8 @@ module liutex_mod
                             liutex_vector(i,j,k,3) = 0.d0
                         end if
 
-                        liutex_magnitude(i,j,k) = sqrt(liutex_vector(i,j,k,1)**2 + liutex_vector(i,j,k,2)**2 + liutex_vector(i,j,k,3)**2)
+                        liutex_magnitude(i,j,k) = sqrt(liutex_vector(i,j,k,1)**2 + liutex_vector(i,j,k,2)**2   &
+                                                       + liutex_vector(i,j,k,3)**2)
 
                     else 
                         !! Velocity gradient has three real roots so Liutex = 0.
@@ -272,11 +274,11 @@ module liutex_mod
         real(8), dimension(imax,jmax,kmax) :: lambda_cr, lambda_r, alpha, beta
 		
         real(8), dimension(3,3) :: a    !! velocity_gradient_tensor
-		real(8), dimension(3,3) :: tt, rotation_matrix, rotated_vel_grad, 
-		real(8), dimension(3) :: z_0, r_star, w, 
+		real(8), dimension(3,3) :: tt, rotation_matrix, rotated_vel_grad
+		real(8), dimension(3) :: z_0, r_star, w
 
 		real(8) :: p, q, r_hat, s, t, delta, aa, b, delta1, delta2, delta3, norm_r_star, eig3r, w_dot_r_2, denominator
-        real(8) :: max_beta_alpha, epsilon
+        real(8) :: beta_alpha, max_beta_alpha, epsilon
 		
 		complex(8) :: eig1c, eig2c
 
@@ -382,7 +384,8 @@ module liutex_mod
 
                         rotated_vel_grad = matmul( matmul(transpose(rotation_matrix), a), rotation_matrix )
 
-                        alpha(i,j,k) = 0.5d0 * sqrt((rotated_vel_grad(2,2) - rotated_vel_grad(1,1))**2 + (rotated_vel_grad(2,1) + rotated_vel_grad(1,2))**2)
+                        alpha(i,j,k) = 0.5d0 * sqrt((rotated_vel_grad(2,2) - rotated_vel_grad(1,1))**2   &
+                                                    + (rotated_vel_grad(2,1) + rotated_vel_grad(1,2))**2)
                         beta(i,j,k)  = 0.5d0 * (rotated_vel_grad(2,1) - rotated_vel_grad(1,2))
 
                         beta_alpha = beta(i,j,k)*beta(i,j,k) - alpha(i,j,k)*alpha(i,j,k)

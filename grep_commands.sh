@@ -30,3 +30,5 @@ wgrib -d $record_number $filename | grep -oP "(?<=TimeU=).*?(?=:)" >> grib_grid_
 # GET VELOCITY DATA:
 wgrib $filename | egrep "(:UGRD:|:VGRD:|:DZDT:)" | grep -v "above gnd" | wgrib -i -grib $filename -text -o grib_velocity_data
 
+echo "Program Complete"
+read -p "Press enter to continue"

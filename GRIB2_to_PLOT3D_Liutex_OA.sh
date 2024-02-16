@@ -59,3 +59,6 @@ gfortran grib_data_read.o liutex_mod.o -o grib2liutex.o
 
 # RUN FORTRAN CODE
 ./grib2liutex.o $1
+
+echo "Program Complete"
+read -p "Press enter to continue"

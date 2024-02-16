@@ -29,10 +29,11 @@ program main
     !! other variables
     real(8), dimension(:,:,:,:,:), allocatable :: velocity_gradient
 
-    real(8), dimension(:,:,:,:), allocatable :: liutex_vector, liutex_magnitude
+    real(8), dimension(:,:,:,:), allocatable :: liutex_vector, mod_omega_liutex_vec
     
     real(8), dimension(:,:,:), allocatable :: first, second, third
     real(8), dimension(:,:,:), allocatable :: u, v, w, x, y, z
+    real(8), dimension(:,:,:), allocatable ::liutex_magnitude, mod_omega_liutex_mag
     
     real(8), dimension(:,:), allocatable :: lat, long
     
@@ -281,13 +282,13 @@ program main
     allocate(liutex_vector(nx, ny, n_levels, 3))
     allocate(liutex_magnitude(nx, ny, n_levels))
     
-    call liutex(velocity_gradient, liutex_vector, liutex_magnitude, imax, jmax, kmax)
+    call liutex(velocity_gradient, liutex_vector, liutex_magnitude, nx, ny, n_levels)
 
     write(*,*) "Calculating Modified Omega Liutex."
-    allocate(mod_omega_liutex_vec(imax,jamx,kmax,3))
-    allocate(mod_omega_liutex_mag(imax,jmax,kmax))
+    allocate(mod_omega_liutex_vec(nx, ny, n_levels,3))
+    allocate(mod_omega_liutex_mag(nx, ny, n_levels))
 
-    call modified_omega_liutex(velocity_gradient, mod_omega_liutex_vec, mod_omega_liutex_mag, imax, jmax, kmax)
+    call modified_omega_liutex(velocity_gradient, mod_omega_liutex_vec, mod_omega_liutex_mag, nx, ny, n_levels)
 
     deallocate(velocity_gradient)
 
@@ -361,8 +362,8 @@ program main
     deallocate(f)
     deallocate(f_lat, f_long, f_height)
     deallocate(u, v, w)
-    deallocate(liutex_x, liutex_y, liutex_z, liutex_magnitude)
-    
+    deallocate(liutex_vector, liutex_magnitude)
+    deallocate(mod_omega_liutex_vec, mod_omega_liutex_mag)
     write(*,*) "Program finished."
 
 end program main
