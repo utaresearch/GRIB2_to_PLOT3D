@@ -28,16 +28,15 @@ program main
 
     !! other variables
     real(8), dimension(:,:,:,:,:), allocatable :: velocity_gradient
+
+    real(8), dimension(:,:,:,:), allocatable :: liutex_vector, liutex_magnitude
     
     real(8), dimension(:,:,:), allocatable :: first, second, third
     real(8), dimension(:,:,:), allocatable :: u, v, w, x, y, z
-    real(8), dimension(:,:,:), allocatable :: liutex_x, liutex_y, liutex_z, liutex_magnitude
     
     real(8), dimension(:,:), allocatable :: lat, long
     
     real(8), dimension(3,3) :: a
-
-    real(8), dimension(3) :: vor, liutex_vec
 
     real(8) :: lat_start, lat_end, lat_step, long_start, long_end, long_step
     real(8) :: dist_x, dist_y
@@ -270,45 +269,25 @@ program main
         end do
     end do
 
-    !! Input heights are also in hPa, we convert them to meters.
-    do i = 1, n_levels
-        !! Convert hPa to meters
-        height_in_meters = 288150.d0*(1.d0 - (height(i) / 1013.25d0)**(1.d0/5.255d0)) / 6.5d0
-
-        z(:,:,i) = height_in_meters
-    end do
 
     !! Calculate the velocity gradient tensor for each point.
-    write(*,*) "Calculating Liutex."
-
+    write(*,*) "Calculating Velocity Gradient."
     allocate(velocity_gradient(nx, ny, n_levels, 3, 3))
 
     velocity_gradient = velocity_gradient_tensor(u, v, w, x, y, z, nx, ny, n_levels)
 
     !! Calculate Liutex for each point.
-    allocate(liutex_x(nx, ny, n_levels))
-    allocate(liutex_y(nx, ny, n_levels))
-    allocate(liutex_z(nx, ny, n_levels))
+    write(*,*) "Calculating Liutex."
+    allocate(liutex_vector(nx, ny, n_levels, 3))
     allocate(liutex_magnitude(nx, ny, n_levels))
     
-    do k = 1, n_levels
-        do j = 1, ny
-            do i = 1, nx
+    call liutex(velocity_gradient, liutex_vector, liutex_magnitude, imax, jmax, kmax)
 
-                a = velocity_gradient(i,j,k,:,:)
-                vor = vorticity(a)
-                
-                call liutex(a, vor, liutex_vec, liutex_mag)
+    write(*,*) "Calculating Modified Omega Liutex."
+    allocate(mod_omega_liutex_vec(imax,jamx,kmax,3))
+    allocate(mod_omega_liutex_mag(imax,jmax,kmax))
 
-                liutex_x(i,j,k) = liutex_vec(1)
-                liutex_y(i,j,k) = liutex_vec(2)
-                liutex_z(i,j,k) = liutex_vec(3)
-
-                liutex_magnitude(i,j,k) = liutex_mag
-
-            end do
-        end do
-    end do
+    call modified_omega_liutex(velocity_gradient, mod_omega_liutex_vec, mod_omega_liutex_mag, imax, jmax, kmax)
 
     deallocate(velocity_gradient)
 
@@ -350,7 +329,7 @@ program main
     deallocate(lat, long, height)
 
     !! Writing function file (.fun)
-    n_vars = 10
+    n_vars = 14
 
     allocate(f(nx, ny, n_levels, n_vars))
 
@@ -360,10 +339,15 @@ program main
     f(:,:,:,4)  = f_lat
     f(:,:,:,5)  = f_long
     f(:,:,:,6)  = f_height
-    f(:,:,:,7)  = liutex_x
-    f(:,:,:,8)  = liutex_y
-    f(:,:,:,9)  = liutex_z
+    f(:,:,:,7)  = liutex_vector(:,:,:,1)
+    f(:,:,:,8)  = liutex_vector(:,:,:,2)
+    f(:,:,:,9)  = liutex_vector(:,:,:,3)
     f(:,:,:,10) = liutex_magnitude
+    f(:,:,:,11) = mod_omega_liutex_vec(:,:,:,1)
+    f(:,:,:,12) = mod_omega_liutex_vec(:,:,:,2)
+    f(:,:,:,13) = mod_omega_liutex_vec(:,:,:,3)
+    f(:,:,:,14) = mod_omega_liutex_mag
+    
 
     open(file3, file=trim(fun_output_filename), form='unformatted', action='write')
     write(file3) nx, ny, n_levels, n_vars
