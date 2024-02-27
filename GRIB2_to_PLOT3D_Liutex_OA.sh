@@ -11,7 +11,7 @@
 # liutex_mod.f08
 # grib_data_read.f08
 
-# Grib2 files need to be in a data folder.
+# Grib2 files need to be in a data folder in this directory.
 
 # INPUT NEEDED from command line (command line arguments):
 # $1 = grib file name (without file name extension)

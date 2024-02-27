@@ -17,7 +17,7 @@ program main
     real(8), external :: latlong_dist
 
     !! file handling variables
-    integer, parameter :: file1=10, file2=20, file3=30
+    integer, parameter :: file1=10, file2=20, file3=30, file4=40
     character(100) :: filename, grib_grid_filename, grib_velocity_filename
     character(500) :: first_velocity_component, second_velocity_component, third_velocity_component
     character(10) :: u_string, v_string, w_string
@@ -210,13 +210,14 @@ program main
 
     !! Filtering out undefined data
     velocity_tolerance = 1.d20
+    undefined_value = 9.999d20
 
     do k = 1, n_levels
         do j = 1, ny
             do i = 1, nx
 
                 if (u(i,j,k) > velocity_tolerance) then
-                    u(i,j,k) = 0.d0
+                    u(i,j,k) = 0.undefined_value
                 end if
                 
                 if (v(i,j,k) > velocity_tolerance) then
@@ -297,8 +298,8 @@ program main
     !! Writing PLOT3D output files
     write(*,*) "Creating and writing PLOT3D grid (.xyz) and function (.fun) files."
 
-    grid_output_filename = 'output_data/grib_plot3d_grid.xyz'
-    fun_output_filename  = 'output_data/grib_plot3d_function.fun'
+    grid_output_filename = 'output_data/' // trim(filename) // '.xyz'
+    fun_output_filename  = 'output_data/' // trim(filename) // '.fun'
 
     !! Writing grid file (.xyz)
     open(file2, file=trim(grid_output_filename), form='unformatted', action='write')
@@ -357,6 +358,60 @@ program main
     write(file3) ((((f(i, j, k, r), i=1,nx), j=1,ny), k=1,n_levels), r=1,n_vars)
     
     close(file3)
+
+    !! Creating data (.dat) output file
+    write(*,*) " "
+    write(*,*) "Creating and writing data (.dat) file."
+    write(*,*) " "
+    write(*,*) "(.dat) data file format/structure."
+    write(*,*) "Line 1 - Dimensions (i_max, j_max, k_max, n_data_variables): "
+    write(*,*) nx, ny, n_levels, n_vars
+    write(*,*) " "
+    write(*,*) "Line 2 - All the data:"
+    write(*,*) "Data Structure: "
+    write(*,*) "================================================="
+    write(*,*) "for variable_index = 1 to n_data_variables"
+    write(*,*) "  for k = 1 to k_max"
+    write(*,*) "    for j = 1 to j_max"
+    write(*,*) "      for i = 1 to i_max"
+    write(*,*) " "
+    write(*,*) "        data(i, j, k, variable_index) = data_value"
+    write(*,*) " "
+    write(*,*) "end all for loops"
+    write(*,*) "================================================="
+    write(*,*) " "
+    write(*,*) "Variables List:"
+    write(*,*) " 1: latitute"
+    write(*,*) " 2: longitude"
+    write(*,*) " 3: pressure level"
+    write(*,*) " 4: u velocity"
+    write(*,*) " 5: v velocity"
+    write(*,*) " 6: w velocity"
+    write(*,*) " 7: liutex vector x-direction"
+    write(*,*) " 8: liutex vector y-direction"
+    write(*,*) " 9: liutex vector z-direction"
+    write(*,*) "10: liutex magnitude"
+    write(*,*) "11: modified omega liutex vector x-direction"
+    write(*,*) "12: modified omega liutex vector y-direction"
+    write(*,*) "13: modified omega liutex vector z-direction"
+    write(*,*) "14: modified omega liutex magnitude"
+    write(*,*) " "
+
+    data_output_filename  = 'output_data/' // trim(filename) // '_liutex_UTA.dat'
+
+    f(:,:,:,1)  = f_lat
+    f(:,:,:,2)  = f_long
+    f(:,:,:,3)  = f_height
+    f(:,:,:,4)  = u
+    f(:,:,:,5)  = v
+    f(:,:,:,6)  = w                
+
+    open(file4, file=trim(data_output_filename), form='unformatted', action='write')
+    write(file4) nx, ny, n_levels, n_vars
+
+    write(file4) ((((f(i, j, k, r), i=1,nx), j=1,ny), k=1,n_levels), r=1,n_vars)
+
+    close(file4)
     
     write(*,*) "File writing successful."
     
