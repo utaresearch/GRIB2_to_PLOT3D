@@ -21,7 +21,7 @@ program main
     character(100) :: filename, grib_grid_filename, grib_velocity_filename
     character(500) :: first_velocity_component, second_velocity_component, third_velocity_component
     character(10) :: u_string, v_string, w_string
-    character(100) :: grid_output_filename, fun_output_filename
+    character(100) :: grid_output_filename, fun_output_filename, data_output_filename
     real(8), dimension(:,:,:,:), allocatable :: f
     real(8), dimension(:,:,:), allocatable :: f_lat, f_long, f_height
     integer :: n_vars
@@ -44,6 +44,7 @@ program main
     real(8) :: height_in_meters
     real(8) :: velocity_tolerance
     real(8) :: liutex_mag
+    real(8) :: undefined_value
 
     integer, dimension(:), allocatable :: height
     integer :: n_levels, time_start
@@ -210,14 +211,13 @@ program main
 
     !! Filtering out undefined data
     velocity_tolerance = 1.d20
-    undefined_value = 9.999d20
 
     do k = 1, n_levels
         do j = 1, ny
             do i = 1, nx
 
                 if (u(i,j,k) > velocity_tolerance) then
-                    u(i,j,k) = 0.undefined_value
+                    u(i,j,k) = 0.d0
                 end if
                 
                 if (v(i,j,k) > velocity_tolerance) then
@@ -405,6 +405,26 @@ program main
     f(:,:,:,4)  = u
     f(:,:,:,5)  = v
     f(:,:,:,6)  = w                
+
+    !! Replacing all zeros with a more OpenGrads friendly number.
+
+    undefined_value = 9.999d20
+    
+    do r = 4, n_vars
+        do k = 1, n_levels
+            do j = 1, ny
+                do i = 1, nx
+
+                    if (f(i,j,k,r) == 0.d0) then
+                        f(i,j,k,r) = undefined_value
+                    end if
+
+                end do 
+            end do
+        end do
+    end do
+
+    !! Writing .dat file.
 
     open(file4, file=trim(data_output_filename), form='unformatted', action='write')
     write(file4) nx, ny, n_levels, n_vars
