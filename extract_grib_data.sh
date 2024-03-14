@@ -1,39 +1,11 @@
 #!/bin/bash
 
-# Author: Oscar Alvarez
-# Email: oscar.alvarez@uta.edu
-# University of Texas at Arlington
-# Department of Mathematics
-# Arlington, Texas U.S.
-
-######### Instructions ############
-# Requires files:
-# liutex_mod.f08
-# grib_data_read.f08
-
-# Grib2 files need to be in a data folder in this directory.
-
-# INPUT NEEDED from command line (command line arguments):
-# $1 = grib file name (without file name extension)
-# $2 = record number of timestamp (usually 1)
-
-# An EXAMPLE on how to run this file:
-# $> ./GRIB2_to_PLOT3D_Liutex_OA.sh FABIAN10L_200309021830_Postr_Mean 1
-
-#### Program Start ####
-
 # FILE NAMES and RECORD NUMBER:
 filename="data/$1"
 ctl_filename="data/$1.ctl"
 record_number="$2"
 grib_grid_file="$1_grid.dat"
 grib_velocity_file="$1_velocity.dat"
-
-# COMPILE FORTRAN CODES
-gfortran -c liutex_mod.f08
-gfortran -c grib_data_read.f08
-gfortran grib_data_read.o liutex_mod.o -o grib2liutex.o
-
 
 # GET LATITUDE GRID INFO:
 wgrib -V -d $record_number $filename | grep "lat" | grep -oP '(?<= lat ).*?(?=to)|(?<=to).*?(?=by)' > $grib_grid_file
@@ -57,13 +29,5 @@ wgrib -d $record_number $filename | grep -oP "(?<=TimeU=).*?(?=:)" >> $grib_grid
 wgrib $filename | egrep "(:UGRD:|:VGRD:|:DZDT:)" | grep -v "above gnd" | wgrib -i -grib $filename -text -o $grib_velocity_file
 
 echo "GRIB file data extraction complete."
-
-
-# RUN FORTRAN CODE
-./grib2liutex.o $1
-
-# rm $grib_grid_file
-# rm $grib_velocity_file
-
-echo "Program Complete"
-read -p "Press enter to continue"
+echo " "
+echo "$1"
