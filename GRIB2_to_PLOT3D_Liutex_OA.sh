@@ -26,14 +26,20 @@
 filename="data/$1"
 ctl_filename="data/$1.ctl"
 record_number="$2"
-grib_grid_file="$1_grid.dat"
-grib_velocity_file="$1_velocity.dat"
+grib_grid_file="output_data/$1_grid.dat"
+grib_velocity_file="output_data/$1_velocity.dat"
+
 
 # COMPILE FORTRAN CODES
+echo " "
+echo "Compiling Fortran Codes"
 gfortran -c liutex_mod.f08
 gfortran -c grib_data_read.f08
 gfortran grib_data_read.o liutex_mod.o -o grib2liutex.o
 
+
+# EXTRACTING DATA FROM GRIB FILES
+echo "Extracting data from GRIB files"
 
 # GET LATITUDE GRID INFO:
 wgrib -V -d $record_number $filename | grep "lat" | grep -oP '(?<= lat ).*?(?=to)|(?<=to).*?(?=by)' > $grib_grid_file
@@ -57,6 +63,8 @@ wgrib -d $record_number $filename | grep -oP "(?<=TimeU=).*?(?=:)" >> $grib_grid
 wgrib $filename | egrep "(:UGRD:|:VGRD:|:DZDT:)" | grep -v "above gnd" | wgrib -i -grib $filename -text -o $grib_velocity_file
 
 echo "GRIB file data extraction complete."
+echo " "
+echo $1
 
 
 # RUN FORTRAN CODE
@@ -65,5 +73,6 @@ echo "GRIB file data extraction complete."
 # rm $grib_grid_file
 # rm $grib_velocity_file
 
+echo " "
 echo "Program Complete"
 read -p "Press enter to continue"

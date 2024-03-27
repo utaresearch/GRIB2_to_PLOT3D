@@ -31,6 +31,7 @@ program main
     real, dimension(:,:,:,:,:), allocatable :: velocity_gradient
 
     real, dimension(:,:,:,:), allocatable :: liutex_vector, mod_omega_liutex_vec
+    real, dimension(:,:,:,:), allocatable :: liutex_magnitude_gradient, mod_omega_liutex_mag_gradient
     
     real, dimension(:,:,:), allocatable :: first, second, third
     real, dimension(:,:,:), allocatable :: u, v, w, x, y, z
@@ -52,8 +53,8 @@ program main
 
     !! Input file names
     call get_command_argument(1, filename)
-    grib_grid_filename = trim(filename) //"_grid.dat"
-    grib_velocity_filename = trim(filename) //"_velocity.dat"
+    grib_grid_filename = "output_data/" // trim(filename) //"_grid.dat"
+    grib_velocity_filename = "output_data/" // trim(filename) //"_velocity.dat"
 
 
     !! Read grib grid data file.
@@ -314,8 +315,8 @@ program main
     allocate(mod_omega_liutex_vec(nx, ny, n_levels, 3))
     allocate(mod_omega_liutex_mag(nx, ny, n_levels))
 
-    mod_omega_liutex_vec = 0.0
-    mod_omega_liutex_mag = 0.0
+    ! mod_omega_liutex_vec = 0.0
+    ! mod_omega_liutex_mag = 0.0
 
     mod_omega_liutex_vec = modified_omega_liutex(velocity_gradient, nx, ny, n_levels)
 
@@ -341,6 +342,18 @@ program main
     end do
 
 
+    !! Calculating magnitude gradients
+    write(*,*) "Calculating Magnitude Gradient Vectors"
+    allocate(liutex_magnitude_gradient(nx, ny, n_levels, 3))
+    allocate(mod_omega_liutex_mag_gradient(nx, ny, n_levels, 3))
+
+    write(*,*) "liutex mag gradient"
+    liutex_magnitude_gradient = gradient(liutex_magnitude, lat, long, pressure, nx, ny, n_levels)
+
+    write(*,*) "modified omega liutex mag gradient"
+    mod_omega_liutex_mag_gradient = gradient(mod_omega_liutex_mag, lat, long, pressure, nx, ny, n_levels)
+
+
     !! Writing PLOT3D output files
     write(*,*) "Creating and writing PLOT3D grid (.xyz) and function (.fun) files."
 
@@ -358,21 +371,33 @@ program main
 
 
     !! Writing function file (.fun)
-    n_vars = 11
+    n_vars = 17
 
     allocate(f(nx, ny, n_levels, n_vars))
 
     f(:,:,:,1)  = u
     f(:,:,:,2)  = v
     f(:,:,:,3)  = w
+    
     f(:,:,:,4)  = liutex_vector(:,:,:,1)
     f(:,:,:,5)  = liutex_vector(:,:,:,2)
     f(:,:,:,6)  = liutex_vector(:,:,:,3)
+    
     f(:,:,:,7)  = liutex_magnitude
-    f(:,:,:,8)  = mod_omega_liutex_vec(:,:,:,1)
-    f(:,:,:,9)  = mod_omega_liutex_vec(:,:,:,2)
-    f(:,:,:,10) = mod_omega_liutex_vec(:,:,:,3)
-    f(:,:,:,11) = mod_omega_liutex_mag
+
+    f(:,:,:,8)  = liutex_magnitude_gradient(:,:,:,1)
+    f(:,:,:,9)  = liutex_magnitude_gradient(:,:,:,2)
+    f(:,:,:,10) = liutex_magnitude_gradient(:,:,:,3)
+    
+    f(:,:,:,11) = mod_omega_liutex_vec(:,:,:,1)
+    f(:,:,:,12) = mod_omega_liutex_vec(:,:,:,2)
+    f(:,:,:,13) = mod_omega_liutex_vec(:,:,:,3)
+    
+    f(:,:,:,14) = mod_omega_liutex_mag
+    
+    f(:,:,:,15) = mod_omega_liutex_mag_gradient(:,:,:,1)
+    f(:,:,:,16) = mod_omega_liutex_mag_gradient(:,:,:,2)
+    f(:,:,:,17) = mod_omega_liutex_mag_gradient(:,:,:,3)
     
 
     open(file3, file=trim(fun_output_filename), form='unformatted', action='write')
@@ -388,13 +413,13 @@ program main
     !! Creating data (.dat) output file
     data_output_filename  = 'output_data/' // trim(filename) // '_liutex_UTA.dat'
 
-    n_data_variables = 14
+    n_data_variables = 20
 
     write(*,*) " "
     write(*,*) "Creating and writing data (.dat) file."
     write(*,*) " "
     write(*,*) "(.dat) data file format/structure."
-    write(*,*) "Line 1 - Dimensions (i_max, j_max, k_max, n_data_variables): "
+    write(*,*) "Line 1 - Dimensions (imax, jmax, kmax, n_data_variables): "
     write(*,*) nx, ny, n_levels, n_data_variables
     write(*,*) " "
     write(*,*) "Line 2 - All the data:"
@@ -421,10 +446,16 @@ program main
     write(*,*) " 8: liutex vector y-direction"
     write(*,*) " 9: liutex vector z-direction"
     write(*,*) "10: liutex magnitude"
-    write(*,*) "11: modified omega liutex vector x-direction"
-    write(*,*) "12: modified omega liutex vector y-direction"
-    write(*,*) "13: modified omega liutex vector z-direction"
-    write(*,*) "14: modified omega liutex magnitude"
+    write(*,*) "11: liutex magnitude vector x-direction"
+    write(*,*) "12: liutex magnitude vector y-direction"
+    write(*,*) "13: liutex magnitude vector z-direction"
+    write(*,*) "14: modified omega liutex vector x-direction"
+    write(*,*) "15: modified omega liutex vector y-direction"
+    write(*,*) "16: modified omega liutex vector z-direction"
+    write(*,*) "17: modified omega liutex magnitude"
+    write(*,*) "18: modified omega liutex magnitude gradient vector x-direction"
+    write(*,*) "19: modified omega liutex magnitude gradient vector y-direction"
+    write(*,*) "20: modified omega liutex magnitude gradient vector z-direction"
     write(*,*) " "
 
     allocate(f2(nx, ny, n_levels, n_data_variables))
@@ -439,10 +470,16 @@ program main
     f2(:,:,:,8)  = liutex_vector(:,:,:,2)
     f2(:,:,:,9)  = liutex_vector(:,:,:,3)
     f2(:,:,:,10) = liutex_magnitude
-    f2(:,:,:,11) = mod_omega_liutex_vec(:,:,:,1)
-    f2(:,:,:,12) = mod_omega_liutex_vec(:,:,:,2)
-    f2(:,:,:,13) = mod_omega_liutex_vec(:,:,:,3)
-    f2(:,:,:,14) = mod_omega_liutex_mag
+    f2(:,:,:,11) = liutex_magnitude_gradient(:,:,:,1)
+    f2(:,:,:,12) = liutex_magnitude_gradient(:,:,:,2)
+    f2(:,:,:,13) = liutex_magnitude_gradient(:,:,:,3)
+    f2(:,:,:,14) = mod_omega_liutex_vec(:,:,:,1)
+    f2(:,:,:,15) = mod_omega_liutex_vec(:,:,:,2)
+    f2(:,:,:,16) = mod_omega_liutex_vec(:,:,:,3)
+    f2(:,:,:,17) = mod_omega_liutex_mag
+    f2(:,:,:,18) = mod_omega_liutex_mag_gradient(:,:,:,1)
+    f2(:,:,:,19) = mod_omega_liutex_mag_gradient(:,:,:,2)
+    f2(:,:,:,20) = mod_omega_liutex_mag_gradient(:,:,:,3)
 
     !! Replacing all zeros with a more OpenGrads friendly number.
 
