@@ -221,59 +221,14 @@ $!ReadDataSet  '|LFDSFN1|'
 $!RemoveVar |LFDSRN1|
 $!RemoveVar |LFDSFN1|
 $!RenameDataSetVar 
-  Var = 20
-  Name = 'Omega Liutex Magnitude'
+  Var = 1
+  Name = 'Latitude'
 $!RenameDataSetVar 
-  Var = 19
-  Name = 'F1V16'
+  Var = 2
+  Name = 'Longitude'
 $!RenameDataSetVar 
-  Var = 4
-  Name = 'Liutex x'
-$!RenameDataSetVar 
-  Var = 5
-  Name = 'Liutex y'
-$!RenameDataSetVar 
-  Var = 6
-  Name = 'Liutex z'
-$!RenameDataSetVar 
-  Var = 7
-  Name = 'Liutex Magnitude'
-$!RenameDataSetVar 
-  Var = 8
-  Name = 'F1V5'
-$!RenameDataSetVar 
-  Var = 8
-  Name = 'Liutex Mag. Gradient x'
-$!RenameDataSetVar 
-  Var = 9
-  Name = 'Liutex Mag. Gradient y'
-$!RenameDataSetVar 
-  Var = 10
-  Name = 'Liutex Mag. Gradient z'
-$!RenameDataSetVar 
-  Var = 11
-  Name = 'Omega Liutex x'
-$!RenameDataSetVar 
-  Var = 12
-  Name = 'Omega Liutex y'
-$!RenameDataSetVar 
-  Var = 13
-  Name = 'Omega Liutex z'
-$!RenameDataSetVar 
-  Var = 14
-  Name = 'Omega Liutex Magnitude'
-$!RenameDataSetVar 
-  Var = 15
-  Name = 'Omega Liutex Mag. Gradient x'
-$!RenameDataSetVar 
-  Var = 16
-  Name = 'Omega Liutex Mag. Gradient y'
-$!RenameDataSetVar 
-  Var = 17
-  Name = 'Omega Liutex Mag. Gradient z'
-$!RenameDataSetVar 
-  Var = 18
-  Name = 'F1V15'
+  Var = 3
+  Name = 'Pressure (mPa)'
 $!RenameDataSetVar 
   Var = 4
   Name = 'u'
@@ -285,25 +240,28 @@ $!RenameDataSetVar
   Name = 'w'
 $!RenameDataSetVar 
   Var = 7
-  Name = 'Liutex x'
+  Name = 'liutex x'
 $!RenameDataSetVar 
   Var = 8
-  Name = 'Liutex y'
+  Name = 'liutex y'
 $!RenameDataSetVar 
   Var = 9
-  Name = 'Liutex z'
+  Name = 'liutex z'
 $!RenameDataSetVar 
   Var = 10
   Name = 'Liutex Magnitude'
 $!RenameDataSetVar 
   Var = 11
-  Name = 'Liutex Mag. Gradient x'
+  Name = 'liutex mag gradient x'
 $!RenameDataSetVar 
   Var = 12
-  Name = 'Liutex Mag. Gradient y'
+  Name = 'liutex mag gradient y'
 $!RenameDataSetVar 
   Var = 13
-  Name = 'Liutex Mag. Gradient z'
+  Name = 'liutex mag gradient z'
+$!RenameDataSetVar 
+  Var = 14
+  Name = 'Omega Liutex x'
 $!RenameDataSetVar 
   Var = 14
   Name = 'Omega Liutex x'
@@ -317,41 +275,26 @@ $!RenameDataSetVar
   Var = 15
   Name = 'Omega Liutex y'
 $!RenameDataSetVar 
-  Var = 16
-  Name = 'Omega Liutex z'
-$!RenameDataSetVar 
   Var = 17
   Name = 'Omega Liutex Magnitude'
 $!RenameDataSetVar 
   Var = 18
-  Name = 'Omega Liutex Mag. Gradient x'
+  Name = 'Omega Liutex Gradient x'
 $!RenameDataSetVar 
   Var = 19
-  Name = 'Omega Liutex Mag. Gradient x'
+  Name = 'Omega Liutex Gradient y'
 $!RenameDataSetVar 
   Var = 20
-  Name = 'Omega Liutex Mag. Gradient z'
-$!RenameDataSetVar 
-  Var = 19
-  Name = 'Omega Liutex Mag. Gradient y'
-$!RenameDataSetVar 
-  Var = 1
-  Name = 'Latitude'
-$!RenameDataSetVar 
-  Var = 2
-  Name = 'Longitude'
-$!RenameDataSetVar 
-  Var = 3
-  Name = 'Pressure (mPa)'
+  Name = 'Omega Liutex Gradient z'
 $!FrameLayout 
   ShowHeader = No
   HeaderColor = Red
   XYPos
     {
-    X = 0.44418
+    X = 1
     Y = 0.25
     }
-  Width = 10.155
+  Width = 9
   Height = 8
 $!ThreeDAxis 
   AspectRatioLimit = 25
@@ -369,30 +312,29 @@ $!GlobalRGB
   RangeMax = 1
 $!GlobalContour  1
   Var = 17
-  ColorMapName = 'Large Rainbow'
-  DefNumLevels = 19
+  ColorMapName = 'Elevation - Above Ground Level'
   Legend
     {
     Show = Yes
     XYPos
       {
-      X = 98.897
-      Y = 8.9617
+      X = 100
+      Y = 9.2352
       }
     IsVertical = No
     AutoResize = Yes
     }
   ColorCutoff
     {
-    RangeMin = 0.248860582709
-    RangeMax = 0.746581748128
+    RangeMin = 0.247614681721
+    RangeMax = 0.742844045162
     }
   ColorMapFilter
     {
     ContinuousColor
       {
       CMin = 0
-      CMax = 0.995442330837
+      CMax = 0.990458726883
       }
     }
 $!ContourLevels New
@@ -419,9 +361,8 @@ $!ContourLevels New
 0.9
 0.95
 $!GlobalContour  2
-  Var = 5
+  Var = 8
   ColorMapName = 'Sequential - Viridis'
-  DefNumLevels = 11
   Legend
     {
     Show = Yes
@@ -441,22 +382,24 @@ $!GlobalContour  2
 $!ContourLevels New
   ContourGroup = 2
   RawData
-11
--100
--80
--60
--40
--20
+14
+-8
+-7
+-6
+-5
+-4
+-3
+-2
+-1
 0
-20
-40
-60
-80
-100
+1
+2
+3
+4
+5
 $!GlobalContour  3
-  Var = 6
+  Var = 9
   ColorMapName = 'Sequential - Viridis'
-  DefNumLevels = 11
   Legend
     {
     Show = Yes
@@ -476,22 +419,29 @@ $!GlobalContour  3
 $!ContourLevels New
   ContourGroup = 3
   RawData
-11
--20
--15
--10
--5
+19
+-1600
+-1400
+-1200
+-1000
+-800
+-600
+-400
+-200
 0
-5
-10
-15
-20
-25
-30
+200
+400
+600
+800
+1000
+1200
+1400
+1600
+1800
+2000
 $!GlobalContour  4
-  Var = 7
+  Var = 10
   ColorMapName = 'Sequential - Viridis'
-  DefNumLevels = 12
   Legend
     {
     Show = Yes
@@ -511,23 +461,20 @@ $!GlobalContour  4
 $!ContourLevels New
   ContourGroup = 4
   RawData
-12
--5
--4
--3
--2
--1
-0
-1
-2
-3
-4
-5
-6
+10
+200
+400
+600
+800
+1000
+1200
+1400
+1600
+1800
+2000
 $!GlobalContour  5
-  Var = 8
+  Var = 11
   ColorMapName = 'Sequential - Viridis'
-  DefNumLevels = 14
   Legend
     {
     Show = Yes
@@ -547,25 +494,23 @@ $!GlobalContour  5
 $!ContourLevels New
   ContourGroup = 5
   RawData
-14
--8
--7
--6
--5
--4
--3
--2
--1
+13
+-120000
+-100000
+-80000
+-60000
+-40000
+-20000
 0
-1
-2
-3
-4
-5
+20000
+40000
+60000
+80000
+100000
+120000
 $!GlobalContour  6
-  Var = 9
+  Var = 12
   ColorMapName = 'Sequential - Viridis'
-  DefNumLevels = 14
   Legend
     {
     Show = Yes
@@ -585,25 +530,23 @@ $!GlobalContour  6
 $!ContourLevels New
   ContourGroup = 6
   RawData
-14
--3000
--2500
--2000
--1500
--1000
--500
+13
+-120000
+-100000
+-80000
+-60000
+-40000
+-20000
 0
-500
-1000
-1500
-2000
-2500
-3000
-3500
+20000
+40000
+60000
+80000
+100000
+120000
 $!GlobalContour  7
-  Var = 10
+  Var = 13
   ColorMapName = 'Sequential - Viridis'
-  DefNumLevels = 18
   Legend
     {
     Show = Yes
@@ -623,29 +566,21 @@ $!GlobalContour  7
 $!ContourLevels New
   ContourGroup = 7
   RawData
-18
-200
-400
-600
-800
-1000
-1200
-1400
-1600
-1800
-2000
-2200
-2400
-2600
-2800
-3000
-3200
-3400
-3600
+11
+-100
+-80
+-60
+-40
+-20
+0
+20
+40
+60
+80
+100
 $!GlobalContour  8
-  Var = 11
+  Var = 14
   ColorMapName = 'Sequential - Viridis'
-  DefNumLevels = 20
   Legend
     {
     Show = Yes
@@ -665,27 +600,24 @@ $!GlobalContour  8
 $!ContourLevels New
   ContourGroup = 8
   RawData
-20
--220000
--200000
--180000
--160000
--140000
--120000
--100000
--80000
--60000
--40000
--20000
+17
+-0.4
+-0.35
+-0.3
+-0.25
+-0.2
+-0.15
+-0.1
+-0.05
 0
-20000
-40000
-60000
-80000
-100000
-120000
-140000
-160000
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
 $!GlobalScatter 
   Legend
     {
@@ -762,32 +694,29 @@ $!ThreeDAxis
   AxisMode = XYDependent
   XYDepXToYRatio = 1
   DepXToYRatio = 1
-  DepXToZRatio = 128.51734573
+  DepXToZRatio = 316.773005261
   FrameAxis
     {
+    Size = 6
     XYPos
       {
-      X = 89.848
-      Y = 87.03
+      X = 91.54
+      Y = 91.196
       }
     }
 $!ThreeDAxis 
   XDetail
     {
-    RangeMin = 18.757999706268311257
-    RangeMax = 22.718000125885009055
-    GRSpacing = 1
-    MinorGridlines
-      {
-      Show = Yes
-      }
+    RangeMin = 19.726123714447020063
+    RangeMax = 21.377023792266847124
+    GRSpacing = 0.5
     Title
       {
       TextShape
         {
-        Height = 2.6
+        Height = 3
         }
-      Offset = 9
+      Offset = 10
       }
     AxisLine
       {
@@ -797,22 +726,14 @@ $!ThreeDAxis
 $!ThreeDAxis 
   YDetail
     {
-    RangeMin = -62.670800018310544033
-    RangeMax = -58.605200958251955967
-    GRSpacing = 1
-    TickLabel
-      {
-      Offset = 2
-      }
-    Gridlines
-      {
-      Show = No
-      }
+    RangeMin = -61.569504547119137783
+    RangeMax = -59.920058441162112217
+    GRSpacing = 0.5
     Title
       {
       TextShape
         {
-        Height = 2.6
+        Height = 3
         }
       Offset = 10
       }
@@ -827,18 +748,13 @@ $!ThreeDAxis
     RangeMin = 2.5
     RangeMax = 1047.5
     GRSpacing = 500
-    MinorGridlines
-      {
-      Show = Yes
-      LinePattern = DashDotDot
-      }
     Title
       {
       TextShape
         {
-        Height = 2.6
+        Height = 3
         }
-      Offset = 12
+      Offset = 18
       }
     AxisLine
       {
@@ -848,8 +764,8 @@ $!ThreeDAxis
 $!IsoSurfaceAttributes  1
   IsoSurfaceSelection = OneSpecificValue
   Isovalue1 = 0.52
-  Isovalue2 = 0.497721165419
-  Isovalue3 = 0.746581748128
+  Isovalue2 = 0.495229363441
+  Isovalue3 = 0.742844045162
   Effects
     {
     LightingEffect = Gouraud
@@ -947,21 +863,6 @@ $!SliceAttributes  1
     I = 1
     J = 1
     K = 1
-    }
-  StartPosition
-    {
-    X = 19.1179997444
-    Y = -62.3012001038
-    Z = 97.5
-    }
-  EndPosition
-    {
-    X = 22.3580000877
-    Y = -58.9748008728
-    Z = 952.5
-    I = 2
-    J = 2
-    K = 2
     }
   EdgeLayer
     {
@@ -1081,7 +982,6 @@ $!StreamAttributes
     }
   MaxSteps = 10000
 $!GlobalThreeD 
-  AxisBoxPadding = 0
   AxisScaleFact
     {
     X = 1
@@ -1090,8 +990,8 @@ $!GlobalThreeD
     }
   RotateOrigin
     {
-    X = 20.73799991607666
-    Y = -60.63800048828125
+    X = 20.55157375335693
+    Y = -60.74478149414062
     Z = 525
     }
   LightSource
@@ -1113,16 +1013,16 @@ $!GlobalThreeD
   VectorLiftFraction = 0.7
   NearPlaneFraction = 0.1
 $!ThreeDView 
-  PSIAngle = 47.5753
-  ThetaAngle = -103.541
-  AlphaAngle = 7.91126
+  PSIAngle = 64.9823
+  ThetaAngle = -120.966
+  AlphaAngle = -0.427011
   ViewerPosition
     {
-    X = 55.1975461413963
-    Y = -52.26918421341401
-    Z = 32842.89832119967
+    X = 35.83045427145781
+    Y = -51.60435566224211
+    Z = 8831.181975752363
     }
-  ViewWidth = 6.04288
+  ViewWidth = 2.7329
 $!FieldLayers 
   ShowMesh = No
   ShowShade = Yes
@@ -1134,19 +1034,21 @@ $!StreamtraceLayers
 $!AttachText 
   AnchorPos
     {
-    X = 7.198862326081939
-    Y = 92.81811085089774
+    X = 4.652038291922134
+    Y = 91.19070667957405
     }
   TextShape
     {
-    Height = 19
+    Height = 16
     }
   Box
     {
-    BoxType = Hollow
+    BoxType = Filled
     Margin = 40
+    LineThickness = 0.2
     }
-  Text = 'Hurricane Fabian:    Omega Liutex Magnitude = 0.52'
+  LineSpacing = 1.5
+  Text = 'Tropical Cyclone: FABIAN10L_200309021830\nOmega Liutex Magnitude = 0.52'
 $!FrameControl ActivateByNumber
   Frame = 1
 $!SetStyleBase Config

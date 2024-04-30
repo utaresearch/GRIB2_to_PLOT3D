@@ -45,11 +45,19 @@ program main
     real :: velocity_tolerance
     real :: liutex_mag
     real :: undefined_value
+    real :: x_min, x_max, y_min, y_max, z_min, z_max
 
     integer :: n_levels, time_start
     integer :: nx, ny
     integer :: i, j, k, r
+    integer :: i_start, i_end, j_start, j_end, k_start, k_end
+    integer :: i_n, j_n, k_n
 
+    logical :: partition_grid, partition_grid_x, partition_grid_y, partition_grid_z
+    logical :: x_start_found, x_end_found
+    logical :: y_start_found, y_end_found
+    logical :: z_start_found, z_end_found
+    
 
     !! Input file names
     call get_command_argument(1, filename)
@@ -354,6 +362,195 @@ program main
     mod_omega_liutex_mag_gradient = gradient(mod_omega_liutex_mag, lat, long, pressure, nx, ny, n_levels)
 
 
+    !! Desired subgrid extraction
+    partition_grid = .true.
+    partition_grid_x = .true.
+    partition_grid_y = .true.
+    partition_grid_z = .false.
+
+    x_min = 19.8
+    x_max = 21.3
+    y_min = -61.5
+    y_max = -60.0
+
+    if (partition_grid) then
+        
+        !! Parse x-domain
+        if (partition_grid_x) then
+
+            write(*,*) "x-domain bounds specified: ", x_min, " - ", x_max
+
+            x_start_found = .false.
+            x_end_found = .false.
+
+            find_x_domain: do k = 1, n_levels
+                do j = 1, ny
+                    do i = 1, nx
+
+                        if ((.not. x_start_found) .and. (lat(i,j,k) .ge. x_min)) then
+                            i_start = i
+                            x_start_found = .true.
+                        end if  
+
+                        if ((.not. x_end_found) .and. (lat(i,j,k) .ge. x_max)) then
+                            i_end = i
+                            x_end_found = .true.
+                        end if
+
+                        if (x_start_found .and. x_end_found) exit find_x_domain
+
+                    end do
+                end do
+            end do find_x_domain
+
+            if (.not. x_start_found) then
+                write(*,*) "Specified x_min domain bounds not well defined or not found."
+                write(*,*) "Default grid domain dimensions set for x_min."
+                i_start = 1
+            end if
+
+            if (.not. x_end_found) then
+                write(*,*) "Specified x_end domain bounds not well defined or not found."
+                write(*,*) "Default grid domain dimensions set for x_max."
+                i_end = nx
+            end if
+
+            i_n = i_end - i_start + 1
+
+        else
+            i_start = 1
+            i_end = nx
+            i_n = nx
+        end if
+
+        !! Parse y-domain
+        if (partition_grid_y) then
+
+            write(*,*) "y-domain bounds specified: ", y_min, " - ", y_max
+
+            y_start_found = .false.
+            y_end_found = .false.
+
+            find_y_domain: do k = 1, n_levels
+                do i = 1, nx
+                    do j = 1, ny
+
+                        if ((.not. y_start_found) .and. (long(i,j,k) .ge. y_min)) then
+                            j_start = j
+                            y_start_found = .true.
+                        end if  
+
+                        if ((.not. y_end_found) .and. (long(i,j,k) .ge. y_max)) then
+                            j_end = j
+                            y_end_found = .true.
+                        end if
+
+                        if (y_start_found .and. y_end_found) exit find_y_domain
+
+                    end do
+                end do
+            end do find_y_domain
+
+            if (.not. y_start_found) then
+                write(*,*) "Specified y_min domain bounds not well defined or not found."
+                write(*,*) "Default grid domain dimensions set for y_min."
+                j_start = 1
+            end if
+
+            if (.not. y_end_found) then
+                write(*,*) "Specified y_end domain bounds not well defined or not found."
+                write(*,*) "Default grid domain dimensions set for y_max."
+                j_end = ny
+            end if
+        
+            j_n = j_end - j_start + 1
+            
+        else
+            j_start = 1
+            j_end = ny
+            j_n = ny
+        end if
+
+
+        !! Parse z-domain
+        if (partition_grid_z) then
+
+            write(*,*) "z-domain bounds specified: ", z_min, " - ", z_max
+
+            z_start_found = .false.
+            z_end_found = .false.
+
+            find_z_domain: do i = 1, nx
+                do j = 1, ny
+                    do k = 1, n_levels
+
+                        if ((.not. z_start_found) .and. (pressure(i,j,k) .ge. z_min)) then
+                            k_start = k
+                            z_start_found = .true.
+                        end if  
+
+                        if ((.not. x_end_found) .and. (pressure(i,j,k) .ge. z_max)) then
+                            k_end = k
+                            z_end_found = .true.
+                        end if
+
+                        if (z_start_found .and. z_end_found) exit find_z_domain
+
+                    end do
+                end do
+            end do find_z_domain
+
+            if (.not. z_start_found) then
+                write(*,*) "Specified z_min domain bounds not well defined or not found."
+                write(*,*) "Default grid domain dimensions set for z_min."
+                k_start = 1
+            end if
+
+            if (.not. z_end_found) then
+                write(*,*) "Specified z_end domain bounds not well defined or not found."
+                write(*,*) "Default grid domain dimensions set for z_max."
+                k_end = n_levels
+            end if
+            
+            k_n = k_end - k_start + 1
+
+        else 
+            k_start = 1
+            k_end = n_levels
+            k_n = n_levels
+        end if
+
+    else
+        i_start = 1
+        i_end = nx
+        j_start = 1
+        j_end = ny
+        k_start = 1
+        k_end = n_levels
+
+        i_n = nx
+        j_n = ny
+        k_n = n_levels
+    end if 
+
+    write(*,*) ' '
+    write(*,*) "Subgrid dimensions:"
+    write(*,*) "i: start, end"
+    write(*,*) i_start, i_end
+    write(*,*) "j: start, end"
+    write(*,*) j_start, j_end
+    write(*,*) "k: start, end"
+    write(*,*) k_start, k_end
+    write(*,*) "i_n, j_n, k_n:"
+    write(*,*) i_n, j_n, k_n
+    write(*,*) "lat_start, lat_end:"
+    write(*,*) lat(i_start,1,1), lat(i_end,1,1)
+    write(*,*) "long_start, long_end:"
+    write(*,*) long(1,j_start,1), long(1,j_end,1)
+    write(*,*) "pressure_start, pressure_end:"
+    write(*,*) pressure(1,1,k_start), pressure(1,1,k_end)
+    write(*,*) ' '
+
     !! Writing PLOT3D output files
     write(*,*) "Creating and writing PLOT3D grid (.xyz) and function (.fun) files."
 
@@ -362,10 +559,10 @@ program main
 
     !! Writing grid file (.xyz)
     open(file2, file=trim(grid_output_filename), form='unformatted', action='write')
-    write(file2) nx, ny, n_levels
-    write(file2) (((lat(i, j, k),      i=1,nx), j=1,ny), k=1,n_levels),    &
-                 (((long(i, j, k),     i=1,nx), j=1,ny), k=1,n_levels),    &
-                 (((pressure(i, j, k), i=1,nx), j=1,ny), k=1,n_levels)
+    write(file2) i_n, j_n, k_n
+    write(file2) (((lat(i, j, k),      i=i_start,i_end), j=j_start,j_end), k=k_start,k_end),    &
+                 (((long(i, j, k),     i=i_start,i_end), j=j_start,j_end), k=k_start,k_end),    &
+                 (((pressure(i, j, k), i=i_start,i_end), j=j_start,j_end), k=k_start,k_end)
 
     close(file2)
 
@@ -401,9 +598,9 @@ program main
     
 
     open(file3, file=trim(fun_output_filename), form='unformatted', action='write')
-    write(file3) nx, ny, n_levels, n_vars
+    write(file3) i_n, j_n, k_n, n_vars
     
-    write(file3) ((((f(i, j, k, r), i=1,nx), j=1,ny), k=1,n_levels), r=1,n_vars)
+    write(file3) ((((f(i, j, k, r), i=i_start,i_end), j=j_start,j_end), k=k_start,k_end), r=1,n_vars)
     
     close(file3)
 
@@ -486,9 +683,9 @@ program main
     undefined_value = 9.999e20
     
     do r = 4, n_data_variables
-        do k = 1, n_levels
-            do j = 1, ny
-                do i = 1, nx
+        do k = k_start, k_end
+            do j = j_start, j_end
+                do i = i_start, i_end
 
                     if (f2(i,j,k,r) == 0.0) then
                         f2(i,j,k,r) = undefined_value
@@ -502,9 +699,9 @@ program main
     !! Writing .dat file.
 
     open(file4, file=trim(data_output_filename), form='unformatted', action='write')
-    write(file4) nx, ny, n_levels, n_data_variables
+    write(file4) i_n, j_n, k_n, n_data_variables
 
-    write(file4) ((((f2(i, j, k, r), i=1,nx), j=1,ny), k=1,n_levels), r=1,n_data_variables)
+    write(file4) ((((f2(i, j, k, r), i=i_start,i_end), j=j_start,j_end), k=k_start,k_end), r=1,n_data_variables)
 
     close(file4)
     
