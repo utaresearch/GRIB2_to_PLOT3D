@@ -23,7 +23,7 @@ program main
     character(10) :: u_string, v_string, w_string
     character(100) :: grid_output_filename, fun_output_filename, data_output_filename
     real, dimension(:,:,:,:), allocatable :: f, f2
-    real, dimension(:,:,:), allocatable :: lat, long, pressure
+    real, dimension(:,:,:), allocatable :: lat, long, pressure, log10_pressure
     integer, dimension(:), allocatable :: height
     integer :: n_vars, n_data_variables
 
@@ -323,9 +323,6 @@ program main
     allocate(mod_omega_liutex_vec(nx, ny, n_levels, 3))
     allocate(mod_omega_liutex_mag(nx, ny, n_levels))
 
-    ! mod_omega_liutex_vec = 0.0
-    ! mod_omega_liutex_mag = 0.0
-
     mod_omega_liutex_vec = modified_omega_liutex(velocity_gradient, nx, ny, n_levels)
 
     write(*,*) 'mod omega in main: ', mod_omega_liutex_mag(nx/2, ny/2, n_levels/2), mod_omega_liutex_vec(nx/2, ny/2, n_levels/2, 1)
@@ -366,12 +363,14 @@ program main
     partition_grid = .true.
     partition_grid_x = .true.
     partition_grid_y = .true.
-    partition_grid_z = .false.
+    partition_grid_z = .true.
 
-    x_min = 19.8
-    x_max = 21.3
-    y_min = -61.5
-    y_max = -60.0
+    x_min = 20.4
+    x_max = 20.9
+    y_min = -61.0
+    y_max = -60.5
+    z_min = 600
+    z_max = 100
 
     if (partition_grid) then
         
@@ -484,12 +483,12 @@ program main
                 do j = 1, ny
                     do k = 1, n_levels
 
-                        if ((.not. z_start_found) .and. (pressure(i,j,k) .ge. z_min)) then
+                        if ((.not. z_start_found) .and. (pressure(i,j,k) .le. z_min)) then
                             k_start = k
                             z_start_found = .true.
                         end if  
 
-                        if ((.not. x_end_found) .and. (pressure(i,j,k) .ge. z_max)) then
+                        if ((.not. x_end_found) .and. (pressure(i,j,k) .le. z_max)) then
                             k_end = k
                             z_end_found = .true.
                         end if
@@ -551,6 +550,20 @@ program main
     write(*,*) pressure(1,1,k_start), pressure(1,1,k_end)
     write(*,*) ' '
 
+
+    !! Log(pressure_values) for better visulaization
+    allocate(log10_pressure(nx,ny,n_levels))
+    do k = 1, n_levels
+        do j = 1, ny
+            do i = 1, nx
+
+                log10_pressure(i,j,k) = log10(pressure(i,j,k))
+
+            end do
+        end do
+    end do
+
+
     !! Writing PLOT3D output files
     write(*,*) "Creating and writing PLOT3D grid (.xyz) and function (.fun) files."
 
@@ -568,33 +581,35 @@ program main
 
 
     !! Writing function file (.fun)
-    n_vars = 17
+    n_vars = 18
 
     allocate(f(nx, ny, n_levels, n_vars))
 
     f(:,:,:,1)  = u
     f(:,:,:,2)  = v
     f(:,:,:,3)  = w
-    
-    f(:,:,:,4)  = liutex_vector(:,:,:,1)
-    f(:,:,:,5)  = liutex_vector(:,:,:,2)
-    f(:,:,:,6)  = liutex_vector(:,:,:,3)
-    
-    f(:,:,:,7)  = liutex_magnitude
 
-    f(:,:,:,8)  = liutex_magnitude_gradient(:,:,:,1)
-    f(:,:,:,9)  = liutex_magnitude_gradient(:,:,:,2)
-    f(:,:,:,10) = liutex_magnitude_gradient(:,:,:,3)
+    f(:,:,:,4) = log10_pressure
     
-    f(:,:,:,11) = mod_omega_liutex_vec(:,:,:,1)
-    f(:,:,:,12) = mod_omega_liutex_vec(:,:,:,2)
-    f(:,:,:,13) = mod_omega_liutex_vec(:,:,:,3)
+    f(:,:,:,5)  = liutex_vector(:,:,:,1)
+    f(:,:,:,6)  = liutex_vector(:,:,:,2)
+    f(:,:,:,7)  = liutex_vector(:,:,:,3)
     
-    f(:,:,:,14) = mod_omega_liutex_mag
+    f(:,:,:,8)  = liutex_magnitude
+
+    f(:,:,:,9)  = liutex_magnitude_gradient(:,:,:,1)
+    f(:,:,:,10)  = liutex_magnitude_gradient(:,:,:,2)
+    f(:,:,:,11) = liutex_magnitude_gradient(:,:,:,3)
     
-    f(:,:,:,15) = mod_omega_liutex_mag_gradient(:,:,:,1)
-    f(:,:,:,16) = mod_omega_liutex_mag_gradient(:,:,:,2)
-    f(:,:,:,17) = mod_omega_liutex_mag_gradient(:,:,:,3)
+    f(:,:,:,12) = mod_omega_liutex_vec(:,:,:,1)
+    f(:,:,:,13) = mod_omega_liutex_vec(:,:,:,2)
+    f(:,:,:,14) = mod_omega_liutex_vec(:,:,:,3)
+    
+    f(:,:,:,15) = mod_omega_liutex_mag
+    
+    f(:,:,:,16) = mod_omega_liutex_mag_gradient(:,:,:,1)
+    f(:,:,:,17) = mod_omega_liutex_mag_gradient(:,:,:,2)
+    f(:,:,:,18) = mod_omega_liutex_mag_gradient(:,:,:,3)
     
 
     open(file3, file=trim(fun_output_filename), form='unformatted', action='write')
@@ -605,6 +620,7 @@ program main
     close(file3)
 
     deallocate(f)
+    deallocate(log10_pressure)
 
 
     !! Creating data (.dat) output file
@@ -710,8 +726,8 @@ program main
     deallocate(f2)
     deallocate(lat, long, pressure)
     deallocate(u, v, w)
-    deallocate(liutex_vector, liutex_magnitude)
-    deallocate(mod_omega_liutex_vec, mod_omega_liutex_mag)
+    deallocate(liutex_vector, liutex_magnitude, liutex_magnitude_gradient)
+    deallocate(mod_omega_liutex_vec, mod_omega_liutex_mag, mod_omega_liutex_mag_gradient)
     write(*,*) "Program finished."
 
 end program main
